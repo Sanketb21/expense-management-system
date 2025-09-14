@@ -3,7 +3,9 @@ package com.splitwiseClone.service.impl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.splitwiseClone.exceptions.InvalidCredentialsException;
 import com.splitwiseClone.exceptions.UserAlreadyExistsException;
+import com.splitwiseClone.exceptions.UserNotFoundException;
 import com.splitwiseClone.model.User;
 import com.splitwiseClone.repository.UserRepository;
 import com.splitwiseClone.service.UserService;
@@ -33,5 +35,23 @@ public class UserServiceImpl implements UserService{
 		User newUser = new User(name, email, hashedPassword);
 		
 		return userRepository.save(newUser);
+	}
+	
+	public User loginUser(String email, String password) {
+		//find user by email
+		User user = userRepository.findByEmail(email);
+		
+		//if user is not found, throw exception
+		if(user == null) {
+			throw new UserNotFoundException("User with email " + email + " not found.");
+		}
+		
+		//compare password with stored hashed password
+		if(!passwordEncoder.matches(password, user.getPassword())) {
+			throw new InvalidCredentialsException("Invalid email or password.");
+		}
+		
+		//if credentials are valid then return user
+		return user;
 	}
 }
