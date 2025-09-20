@@ -1,10 +1,17 @@
 package com.splitwiseClone.model;
 
+import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity //tells springboot that this class is a jpa entity and should be mapped to a database table named as same as class name
@@ -17,6 +24,14 @@ public class User {
 	@Column(unique = true) //tells that no 2 users can have same value
 	private String email;
 	private String password;
+	
+	@JsonIgnore
+	@ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+	private List<Group> groups = new ArrayList<>();
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "paidBy", fetch = FetchType.LAZY)
+	private List<Expense> expensesPaid = new ArrayList<>();
 	
 	public User() {
 	}
