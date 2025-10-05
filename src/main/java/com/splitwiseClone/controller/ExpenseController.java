@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.splitwiseClone.model.Expense;
 import com.splitwiseClone.service.ExpenseService;
+import com.splitwiseClone.dto.ExpenseCreateRequest;
+import com.splitwiseClone.dto.ExpenseResponse;
+import com.splitwiseClone.mapper.ExpenseMapper;
 
 @RestController
 @RequestMapping("/expenses")
@@ -24,17 +27,20 @@ public class ExpenseController {
 	}
 	
 	@PostMapping("/create")
-	public ResponseEntity<Expense> createExpense(@RequestBody Expense expense){
-		// we will pass the expense object directly to the service which will then handle the splits
-		// the service will set the expense for each split internally
+	public ResponseEntity<ExpenseResponse> createExpense(@RequestBody ExpenseCreateRequest request){
+		Expense expense = ExpenseMapper.toEntity(request);
 		Expense createdExpense = expenseService.createExpense(expense);
-		return ResponseEntity.ok(createdExpense);
+		return ResponseEntity.ok(ExpenseMapper.toResponse(createdExpense));
 	}	
 	
 	@GetMapping("/{groupId}")
-	public ResponseEntity<List<Expense>> getExpensesByGroupId(@PathVariable long groupId){
+	public ResponseEntity<List<ExpenseResponse>> getExpensesByGroupId(@PathVariable long groupId){
 		List<Expense> expenses = expenseService.getExpensesByGroupId(groupId);
-		return ResponseEntity.ok(expenses);
+		List<ExpenseResponse> response = new ArrayList<>();
+		for(Expense e: expenses){
+			response.add(ExpenseMapper.toResponse(e));
+		}
+		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("/{groupId}/balances")
