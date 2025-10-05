@@ -3,6 +3,7 @@ package com.splitwiseClone.model;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -25,6 +26,7 @@ public class User {
 	private String name; 
 	@Column(unique = true) //tells that no 2 users can have same value
 	private String email;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String password;
 	
 	@JsonIgnore
