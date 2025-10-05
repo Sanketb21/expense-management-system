@@ -1,8 +1,8 @@
 package com.splitwiseClone.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,15 +27,20 @@ public class ExpenseController {
 	public ResponseEntity<Expense> createExpense(@RequestBody Expense expense){
 		// we will pass the expense object directly to the service which will then handle the splits
 		// the service will set the expense for each split internally
-		Expense createdExpense = expenseService.createExpense(expense, expense.getSplits());
-		return new ResponseEntity<>(createdExpense, HttpStatus.CREATED);
+		Expense createdExpense = expenseService.createExpense(expense);
+		return ResponseEntity.ok(createdExpense);
 	}	
 	
 	@GetMapping("/{groupId}")
 	public ResponseEntity<List<Expense>> getExpensesByGroupId(@PathVariable long groupId){
 		List<Expense> expenses = expenseService.getExpensesByGroupId(groupId);
-		return new ResponseEntity<>(expenses, HttpStatus.OK);
+		return ResponseEntity.ok(expenses);
 	}
 	
+	@GetMapping("/{groupId}/balances")
+	public ResponseEntity<Map<Long, BigDecimal>> calculateBalances(@PathVariable long groupId){
+		Map<Long, BigDecimal> balances = expenseService.calculateBalancesByGroup(groupId);
+		return ResponseEntity.ok(balances);
+	}
 	
 }

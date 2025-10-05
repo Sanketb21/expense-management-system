@@ -1,11 +1,12 @@
 package com.splitwiseClone.service;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import com.splitwiseClone.model.Expense;
-import com.splitwiseClone.model.Split;
 
 public interface ExpenseService {
-	Expense createExpense(Expense expense, List<Split> splits);
+	Expense createExpense(Expense expense);
 	List<Expense> getExpensesByGroupId(long groupId);
+	Map<Long, BigDecimal> calculateBalancesByGroup(long groupId);
 }

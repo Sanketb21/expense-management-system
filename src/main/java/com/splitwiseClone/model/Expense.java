@@ -16,6 +16,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 @Table(name = "expenses")
@@ -40,6 +42,9 @@ public class Expense {
 	
 	@OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, fetch = FetchType.EAGER) //an expense has many splits
 	private List<Split> splits;
+
+	@Enumerated(EnumType.STRING)
+	private SplitType splitType; // EQUAL, EXACT, PERCENT
 
 	public Expense() {
 	}
@@ -106,5 +111,13 @@ public class Expense {
 
 	public void setSplits(List<Split> splits) {
 		this.splits = splits;
+	}
+
+	public SplitType getSplitType() {
+		return splitType;
+	}
+
+	public void setSplitType(SplitType splitType) {
+		this.splitType = splitType;
 	}
 }

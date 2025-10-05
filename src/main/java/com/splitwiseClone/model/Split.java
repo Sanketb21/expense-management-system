@@ -29,7 +29,6 @@ public class Split {
 	@JoinColumn(name = "expense_id")
 	private Expense expense;
 	
-	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
