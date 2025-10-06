@@ -6,9 +6,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import com.splitwiseClone.model.User;
 import com.splitwiseClone.service.UserService;
+import com.splitwiseClone.dto.UserRegisterRequest;
+import com.splitwiseClone.dto.UserLoginRequest;
+import com.splitwiseClone.dto.UserResponse;
+import com.splitwiseClone.mapper.UserMapper;
 
 @RestController
 @RequestMapping("/users")
@@ -22,21 +27,20 @@ public class UserController {
 	
 	//handles http POST request to the /users/register endpoint
 	//@RequestBody maps the json data from request body to a user object
-	@PostMapping("/register")
-	public ResponseEntity<User> registerUser(@RequestBody User user){
-		User registeredUser = userService.registerUser(
-				user.getName(),
-				user.getEmail(),
-				user.getPassword());
-		//if user is registered successfully, then return the user object with a 201 created status code
-		return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-	}
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> registerUser(@Validated @RequestBody UserRegisterRequest req){
+        User registeredUser = userService.registerUser(
+                req.getName(),
+                req.getEmail(),
+                req.getPassword());
+        return new ResponseEntity<>(UserMapper.toResponse(registeredUser), HttpStatus.CREATED);
+    }
 	
-	@PostMapping("/login")
-	public ResponseEntity<User> loginUser(@RequestBody User user){
-		User loggedInUser = userService.loginUser(user.getEmail(), user.getPassword());
-		return new ResponseEntity<>(loggedInUser, HttpStatus.OK);
-	}
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> loginUser(@Validated @RequestBody UserLoginRequest req){
+        User loggedInUser = userService.loginUser(req.getEmail(), req.getPassword());
+        return new ResponseEntity<>(UserMapper.toResponse(loggedInUser), HttpStatus.OK);
+    }
 	
 	
 }
