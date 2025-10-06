@@ -15,6 +15,7 @@ import com.splitwiseClone.repository.ExpenseRepository;
 import com.splitwiseClone.repository.GroupRepository;
 import com.splitwiseClone.repository.UserRepository;
 import com.splitwiseClone.service.ExpenseService;
+import com.splitwiseClone.dto.SettleTransactionResponse;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -163,6 +164,41 @@ public class ExpenseServiceImpl implements ExpenseService{
 			}	
 		}
 		return balances;
+	}
+
+	@Override
+	public List<SettleTransactionResponse> calculateSettleUp(long groupId) {
+		Map<Long, BigDecimal> balances = calculateBalancesByGroup(groupId);
+		List<Map.Entry<Long, BigDecimal>> debtors = new ArrayList<>(); // negative balances
+		List<Map.Entry<Long, BigDecimal>> creditors = new ArrayList<>(); // positive balances
+		for (Map.Entry<Long, BigDecimal> e : balances.entrySet()) {
+			int cmp = e.getValue().compareTo(BigDecimal.ZERO);
+			if (cmp < 0) debtors.add(e);
+			else if (cmp > 0) creditors.add(e);
+		}
+
+		// Sort for deterministic behavior (largest absolute first)
+		debtors.sort((a,b) -> b.getValue().abs().compareTo(a.getValue().abs()));
+		creditors.sort((a,b) -> b.getValue().compareTo(a.getValue()));
+
+		List<SettleTransactionResponse> result = new ArrayList<>();
+		int i = 0, j = 0;
+		while (i < debtors.size() && j < creditors.size()) {
+			Map.Entry<Long, BigDecimal> d = debtors.get(i);
+			Map.Entry<Long, BigDecimal> c = creditors.get(j);
+			BigDecimal owe = d.getValue().abs();
+			BigDecimal receive = c.getValue();
+			BigDecimal amount = owe.min(receive);
+			if (amount.compareTo(BigDecimal.ZERO) > 0) {
+				result.add(new SettleTransactionResponse(d.getKey(), c.getKey(), amount));
+				// update balances
+				debtors.set(i, Map.entry(d.getKey(), d.getValue().add(amount))); // less negative
+				creditors.set(j, Map.entry(c.getKey(), c.getValue().subtract(amount)));
+			}
+			if (debtors.get(i).getValue().compareTo(BigDecimal.ZERO) == 0) i++;
+			if (creditors.get(j).getValue().compareTo(BigDecimal.ZERO) == 0) j++;
+		}
+		return result;
 	}
 	
 	

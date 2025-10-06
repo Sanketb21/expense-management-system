@@ -34,6 +34,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/groups").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/expenses/{groupId}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/balances").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/settle-up").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

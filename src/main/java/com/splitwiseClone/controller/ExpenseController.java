@@ -18,6 +18,7 @@ import com.splitwiseClone.dto.ExpenseCreateRequest;
 import com.splitwiseClone.dto.ExpenseResponse;
 import com.splitwiseClone.mapper.ExpenseMapper;
 import com.splitwiseClone.dto.BalanceResponse;
+import com.splitwiseClone.dto.SettleTransactionResponse;
 
 @RestController
 @RequestMapping("/expenses")
@@ -53,6 +54,12 @@ public class ExpenseController {
             response.add(new BalanceResponse(e.getKey(), e.getValue()));
         }
         return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/{groupId}/settle-up")
+	public ResponseEntity<List<SettleTransactionResponse>> settleUp(@PathVariable long groupId){
+		List<SettleTransactionResponse> txns = expenseService.calculateSettleUp(groupId);
+		return ResponseEntity.ok(txns);
 	}
 	
 }
