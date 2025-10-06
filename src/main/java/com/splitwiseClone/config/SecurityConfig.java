@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/expenses/{groupId}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/balances").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/settle-up").permitAll()
+                                .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

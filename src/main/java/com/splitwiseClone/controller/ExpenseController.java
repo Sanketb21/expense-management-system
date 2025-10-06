@@ -20,8 +20,12 @@ import com.splitwiseClone.mapper.ExpenseMapper;
 import com.splitwiseClone.dto.BalanceResponse;
 import com.splitwiseClone.dto.SettleTransactionResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/expenses")
+@Tag(name = "Expenses", description = "Create and query expenses and balances")
 public class ExpenseController {
 	private final ExpenseService expenseService;
 
@@ -29,14 +33,16 @@ public class ExpenseController {
 		this.expenseService = expenseService;
 	}
 	
-	@PostMapping("/create")
+    @PostMapping("/create")
+    @Operation(summary = "Create an expense", description = "Creates an expense with split strategy and returns the created expense")
     public ResponseEntity<ExpenseResponse> createExpense(@Validated @RequestBody ExpenseCreateRequest request){
 		Expense expense = ExpenseMapper.toEntity(request);
 		Expense createdExpense = expenseService.createExpense(expense);
 		return ResponseEntity.ok(ExpenseMapper.toResponse(createdExpense));
 	}	
 	
-	@GetMapping("/{groupId}")
+    @GetMapping("/{groupId}")
+    @Operation(summary = "List expenses for a group")
 	public ResponseEntity<List<ExpenseResponse>> getExpensesByGroupId(@PathVariable long groupId){
 		List<Expense> expenses = expenseService.getExpensesByGroupId(groupId);
 		List<ExpenseResponse> response = new ArrayList<>();
@@ -46,7 +52,8 @@ public class ExpenseController {
 		return ResponseEntity.ok(response);
 	}
 	
-	@GetMapping("/{groupId}/balances")
+    @GetMapping("/{groupId}/balances")
+    @Operation(summary = "Compute balances for a group", description = "Returns net balance per user for the group")
     public ResponseEntity<List<BalanceResponse>> calculateBalances(@PathVariable long groupId){
         Map<Long, BigDecimal> balances = expenseService.calculateBalancesByGroup(groupId);
         List<BalanceResponse> response = new ArrayList<>();
@@ -56,7 +63,8 @@ public class ExpenseController {
         return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/{groupId}/settle-up")
+    @GetMapping("/{groupId}/settle-up")
+    @Operation(summary = "Compute minimal settle-up transactions", description = "Returns who should pay whom and how much to settle balances")
 	public ResponseEntity<List<SettleTransactionResponse>> settleUp(@PathVariable long groupId){
 		List<SettleTransactionResponse> txns = expenseService.calculateSettleUp(groupId);
 		return ResponseEntity.ok(txns);

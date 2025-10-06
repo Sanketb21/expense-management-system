@@ -15,8 +15,12 @@ import com.splitwiseClone.dto.UserLoginRequest;
 import com.splitwiseClone.dto.UserResponse;
 import com.splitwiseClone.mapper.UserMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/users")
+@Tag(name = "Users", description = "User registration and login")
 public class UserController {
 	private final UserService userService;
 
@@ -28,6 +32,7 @@ public class UserController {
 	//handles http POST request to the /users/register endpoint
 	//@RequestBody maps the json data from request body to a user object
     @PostMapping("/register")
+    @Operation(summary = "Register a new user")
     public ResponseEntity<UserResponse> registerUser(@Validated @RequestBody UserRegisterRequest req){
         User registeredUser = userService.registerUser(
                 req.getName(),
@@ -37,6 +42,7 @@ public class UserController {
     }
 	
     @PostMapping("/login")
+    @Operation(summary = "Login a user")
     public ResponseEntity<UserResponse> loginUser(@Validated @RequestBody UserLoginRequest req){
         User loggedInUser = userService.loginUser(req.getEmail(), req.getPassword());
         return new ResponseEntity<>(UserMapper.toResponse(loggedInUser), HttpStatus.OK);

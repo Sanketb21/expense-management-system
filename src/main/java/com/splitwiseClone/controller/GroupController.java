@@ -14,8 +14,12 @@ import com.splitwiseClone.dto.GroupCreateRequest;
 import com.splitwiseClone.dto.GroupResponse;
 import com.splitwiseClone.mapper.GroupMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/groups")
+@Tag(name = "Groups", description = "Group creation and management")
 public class GroupController {
 	private final GroupService groupService;
 
@@ -24,6 +28,7 @@ public class GroupController {
 	}
 	
     @PostMapping("/create")
+    @Operation(summary = "Create a group")
     public ResponseEntity<GroupResponse> createGroup(@Validated @RequestBody GroupCreateRequest req){
         Group newGroup = groupService.createGroup(req.getName());
         return new ResponseEntity<>(GroupMapper.toResponse(newGroup), HttpStatus.CREATED);
