@@ -28,6 +28,9 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers(HttpMethod.POST, "/users/register", "/users/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/groups/create").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/groups/{groupId}/members").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/groups/{groupId}/members/{userId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/groups/{groupId}").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/expenses/create").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/expenses/add_split").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users").permitAll()
