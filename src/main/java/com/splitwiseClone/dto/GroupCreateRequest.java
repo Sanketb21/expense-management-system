@@ -3,7 +3,7 @@ package com.splitwiseClone.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public class GroupCreateRequest {
-    @NotBlank
+    @NotBlank(message = "Group name is required")
     private String name;
 
     public String getName() { return name; }

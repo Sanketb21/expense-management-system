@@ -11,22 +11,22 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class ExpenseCreateRequest {
-    @NotBlank
+    @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 
-    @NotNull
-    @Min(1)
+    @NotNull(message = "Paid by user ID is required")
+    @Min(value = 1, message = "Paid by user ID must be positive")
     private Long paidById;
 
-    @NotNull
-    @Min(1)
+    @NotNull(message = "Group ID is required")
+    @Min(value = 1, message = "Group ID must be positive")
     private Long groupId;
 
-    @NotNull
+    @NotNull(message = "Split type is required")
     private SplitType splitType; // EQUAL, EXACT, PERCENT
 
     private List<SplitRequest> splits;

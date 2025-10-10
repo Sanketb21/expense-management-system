@@ -4,11 +4,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class UserRegisterRequest {
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
-    @NotBlank @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     private String email;
-    @NotBlank
+    @NotBlank(message = "Password is required")
     private String password;
 
     public String getName() { return name; }
