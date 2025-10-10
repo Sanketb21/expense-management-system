@@ -1,5 +1,6 @@
 package com.splitwiseClone.controller;
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,5 +58,15 @@ public class GroupController {
     public ResponseEntity<GroupResponse> getGroup(@PathVariable long groupId){
         Group g = groupService.getById(groupId);
         return ResponseEntity.ok(GroupMapper.toResponse(g));
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all groups")
+    public ResponseEntity<List<GroupResponse>> getAllGroups(){
+        List<Group> groups = groupService.getAllGroups();
+        List<GroupResponse> response = groups.stream()
+            .map(GroupMapper::toResponse)
+            .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 }

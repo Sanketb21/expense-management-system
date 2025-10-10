@@ -1,6 +1,7 @@
 package com.splitwiseClone.service.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -36,6 +37,12 @@ public class GroupServiceImpl implements GroupService{
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
         Set<User> members = group.getMembers();
         if (members == null) members = new HashSet<>();
+        
+        // Check if user is already a member
+        if (members.contains(user)) {
+            throw new IllegalArgumentException("User is already a member of this group");
+        }
+        
         members.add(user);
         group.setMembers(members);
         return groupRepository.save(group);
@@ -55,5 +62,10 @@ public class GroupServiceImpl implements GroupService{
     @Override
     public Group getById(long groupId) {
         return groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found: " + groupId));
+    }
+
+    @Override
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
     }
 }
