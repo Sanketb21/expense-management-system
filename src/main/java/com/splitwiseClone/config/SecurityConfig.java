@@ -6,13 +6,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+	public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+	}
 	
 	@Bean //bcryptpassword encoder for hashing passwords
 	public PasswordEncoder passwordEncoder() {
@@ -26,23 +33,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                // Public endpoints
                                 .requestMatchers(HttpMethod.POST, "/users/register", "/users/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/groups/create").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/groups/{groupId}/members").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/groups/{groupId}/members/{userId}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/groups/{groupId}").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/expenses/create").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/expenses/add_split").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/users").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/groups").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/expenses/{groupId}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/balances").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/expenses/{groupId}/settle-up").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                                // All other endpoints require authentication
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
-                .httpBasic(Customizer.withDefaults());
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
