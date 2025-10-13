@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.splitwiseClone.model.Expense;
@@ -145,6 +147,11 @@ public class ExpenseServiceImpl implements ExpenseService{
 	@Override
 	public List<Expense> getExpensesByGroupId(long groupId){
 		return expenseRepository.findByGroupId(groupId);
+	}
+	
+	@Override
+	public Page<Expense> getExpensesByGroupId(long groupId, Pageable pageable){
+		return expenseRepository.findByGroupId(groupId, pageable);
 	}
 	
 	@Override
