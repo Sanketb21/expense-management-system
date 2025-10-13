@@ -14,6 +14,7 @@ import com.splitwiseClone.model.SplitType;
 import com.splitwiseClone.repository.ExpenseRepository;
 import com.splitwiseClone.repository.GroupRepository;
 import com.splitwiseClone.repository.UserRepository;
+import com.splitwiseClone.repository.SettlementRepository;
 import com.splitwiseClone.service.ExpenseService;
 import com.splitwiseClone.dto.SettleTransactionResponse;
 
@@ -23,12 +24,14 @@ import jakarta.persistence.EntityNotFoundException;
 public class ExpenseServiceImpl implements ExpenseService{
 	private final ExpenseRepository expenseRepository;
 	private final UserRepository userRepository;
-	private final GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
+    private final SettlementRepository settlementRepository;
 	
-	public ExpenseServiceImpl(ExpenseRepository expenseRepository, UserRepository userRepository, GroupRepository groupRepository) {
+    public ExpenseServiceImpl(ExpenseRepository expenseRepository, UserRepository userRepository, GroupRepository groupRepository, SettlementRepository settlementRepository) {
 		this.expenseRepository = expenseRepository;
 		this.userRepository = userRepository;
 		this.groupRepository = groupRepository;
+        this.settlementRepository = settlementRepository;
 	}
 	
 	@Override
@@ -163,6 +166,18 @@ public class ExpenseServiceImpl implements ExpenseService{
 				balances.put(splitUserId, balances.getOrDefault(splitUserId, BigDecimal.ZERO).subtract(splitAmount));
 			}	
 		}
+        // apply settlements: fromUser paid amount to toUser => reduce debt/increase payer balance, reduce receiver credit
+        settlementRepository.findByGroupId(groupId).forEach(s -> {
+            long fromId = s.getFromUser() != null ? s.getFromUser().getId() : 0L;
+            long toId = s.getToUser() != null ? s.getToUser().getId() : 0L;
+            BigDecimal amt = s.getAmount();
+            if (fromId != 0L && amt != null) {
+                balances.put(fromId, balances.getOrDefault(fromId, BigDecimal.ZERO).add(amt));
+            }
+            if (toId != 0L && amt != null) {
+                balances.put(toId, balances.getOrDefault(toId, BigDecimal.ZERO).subtract(amt));
+            }
+        });
 		return balances;
 	}
 
